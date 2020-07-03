@@ -1,14 +1,14 @@
 #pragma once
 
-#include <base_realsense_node.h>
+#include <base_realsense_node.hpp>
 
 namespace realsense2_camera
 {
     class T265RealsenseNode : public BaseRealSenseNode
     {
         public:
-            T265RealsenseNode(ros::NodeHandle& nodeHandle,
-                          ros::NodeHandle& privateNodeHandle,
+            T265RealsenseNode(rclcpp::Node::SharedPtr nodeHandle,
+                          rclcpp::Node::SharedPtr privateNodeHandle,
                           rs2::device dev,
                           const std::string& serial_no);
             void publishTopics();
@@ -19,9 +19,10 @@ namespace realsense2_camera
         private:
             void initializeOdometryInput();
             void setupSubscribers();
-            void odom_in_callback(const nav_msgs::Odometry::ConstPtr& msg);
+            void odom_in_callback(const nav_msgs::msg::Odometry::ConstPtr& msg);
 
-            ros::Subscriber _odom_subscriber;
+            rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr _odom_subscriber;
+            
             rs2::wheel_odometer _wo_snr;
             bool _use_odom_in;
     };

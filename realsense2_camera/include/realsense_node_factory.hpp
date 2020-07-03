@@ -4,18 +4,18 @@
 #pragma once
 
 #include <pluginlib/class_list_macros.h>
-#include <nodelet/nodelet.h>
+// #include <nodelet/nodelet.h>
 #include <image_transport/image_transport.h>
-#include <ros/ros.h>
-#include <ros/package.h>
+#include "rclcpp/rclcpp.hpp"
+// #include <ros/package.h>
 #include <librealsense2/rs.hpp>
 #include <librealsense2/rsutil.h>
 #include <librealsense2/hpp/rs_processing.hpp>
 #include <librealsense2/rs_advanced_mode.hpp>
 #include <cv_bridge/cv_bridge.h>
-#include <constants.h>
-#include <realsense2_camera/Extrinsics.h>
-#include <realsense2_camera/IMUInfo.h>
+#include <constants.hpp>
+#include "realsense2_core/msg/extrinsics.hpp"
+#include "realsense2_core/msg/imu_info.hpp"
 #include <csignal>
 #include <eigen3/Eigen/Geometry>
 #include <fstream>
@@ -47,11 +47,11 @@ namespace realsense2_camera
     {
     public:
         virtual void publishTopics() = 0;
-        virtual void registerDynamicReconfigCb(ros::NodeHandle& nh) = 0;
+        virtual void registerDynamicReconfigCb(rclcpp::Node::SharedPtr nh) = 0;
         virtual ~InterfaceRealSenseNode() = default;
     };
 
-    class RealSenseNodeFactory : public nodelet::Nodelet
+    class RealSenseNodeFactory// : public nodelet::Nodelet
     {
     public:
         RealSenseNodeFactory();

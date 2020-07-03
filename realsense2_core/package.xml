@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>realsense2_camera</name>
+  <name>realsense2_core</name>
   <version>2.2.14</version>
   <description>RealSense Camera package allowing access to Intel T265 Tracking module and SR300 and D400 3D cameras</description>
   <maintainer email="sergey.dorodnicov@intel.com">Sergey Dorodnicov</maintainer>
@@ -18,21 +18,12 @@
 
   <build_depend>rclcpp</build_depend>
   <build_depend>pluginlib</build_depend>
-  <build_depend>eigen</build_depend>
-  <build_depend>image_transport</build_depend>
-  <build_depend>cv_bridge</build_depend>
   <build_depend>nav_msgs</build_depend>
   <!-- <build_depend>nodelet</build_depend>   -->
   <build_depend>genmsg</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>realsense2_core</build_depend>
-  <!-- <build_depend>message_runtime</build_depend> -->
-  <build_depend>tf2</build_depend>
-  <!-- <build_depend>ddynamic_reconfigure</build_depend> -->
-  <!-- <build_depend>diagnostic_updater</build_depend> -->
-  <build_depend>librealsense2</build_depend>
   <build_depend>builtin_interfaces</build_depend>
 
 
@@ -47,12 +38,6 @@
   <exec_depend>roscpp</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-  <!-- <exec_depend>message_runtime</exec_depend> -->
-  <exec_depend>tf2</exec_depend>
-  <!-- <exec_depend>ddynamic_reconfigure</exec_depend> -->
-  <!-- <exec_depend>diagnostic_updater</exec_depend> -->
-  <exec_depend>librealsense2</exec_depend>
-  <exec_depend>builtin_interfaces</exec_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
 
   <member_of_group>rosidl_interface_packages</member_of_group>
