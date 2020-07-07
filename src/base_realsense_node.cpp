@@ -104,7 +104,8 @@ namespace realsense_camera
     while (false == connectToCamera())  // Poll for camera and connect if found
     {
       RCLCPP_INFO_STREAM(_nh->get_logger(), nodelet_name_ << " - Sleeping 5 seconds then retrying to connect");
-      rclcpp::Duration(5).sleep();
+      // rclcpp::Duration(5).sleep();
+      rclcpp::sleep_for(5s);
     }
 
     advertiseTopics();
@@ -161,30 +162,31 @@ namespace realsense_camera
     nodelet_name_ = "sensor";
     // nh_ = getNodeHandle();
     // pnh_ = getPrivateNodeHandle();
-    pnh_.getParam("serial_no", serial_no_);
-    pnh_.getParam("usb_port_id", usb_port_id_);
-    pnh_.getParam("camera_type", camera_type_);
-    pnh_.param("mode", mode_, DEFAULT_MODE);
-    pnh_.param("enable_depth", enable_[RS_STREAM_DEPTH], ENABLE_DEPTH);
-    pnh_.param("enable_color", enable_[RS_STREAM_COLOR], ENABLE_COLOR);
-    pnh_.param("enable_ir", enable_[RS_STREAM_INFRARED], ENABLE_IR);
-    pnh_.param("enable_pointcloud", enable_pointcloud_, ENABLE_PC);
-    pnh_.param("enable_tf", enable_tf_, ENABLE_TF);
-    pnh_.param("enable_tf_dynamic", enable_tf_dynamic_, ENABLE_TF_DYNAMIC);
-    pnh_.param("tf_publication_rate", tf_publication_rate_, TF_PUBLICATION_RATE);
-    pnh_.param("depth_width", width_[RS_STREAM_DEPTH], DEPTH_WIDTH);
-    pnh_.param("depth_height", height_[RS_STREAM_DEPTH], DEPTH_HEIGHT);
-    pnh_.param("color_width", width_[RS_STREAM_COLOR], COLOR_WIDTH);
-    pnh_.param("color_height", height_[RS_STREAM_COLOR], COLOR_HEIGHT);
-    pnh_.param("depth_fps", fps_[RS_STREAM_DEPTH], DEPTH_FPS);
-    pnh_.param("color_fps", fps_[RS_STREAM_COLOR], COLOR_FPS);
-    pnh_.param("base_frame_id", base_frame_id_, DEFAULT_BASE_FRAME_ID);
-    pnh_.param("depth_frame_id", frame_id_[RS_STREAM_DEPTH], DEFAULT_DEPTH_FRAME_ID);
-    pnh_.param("color_frame_id", frame_id_[RS_STREAM_COLOR], DEFAULT_COLOR_FRAME_ID);
-    pnh_.param("ir_frame_id", frame_id_[RS_STREAM_INFRARED], DEFAULT_IR_FRAME_ID);
-    pnh_.param("depth_optical_frame_id", optical_frame_id_[RS_STREAM_DEPTH], DEFAULT_DEPTH_OPTICAL_FRAME_ID);
-    pnh_.param("color_optical_frame_id", optical_frame_id_[RS_STREAM_COLOR], DEFAULT_COLOR_OPTICAL_FRAME_ID);
-    pnh_.param("ir_optical_frame_id", optical_frame_id_[RS_STREAM_INFRARED], DEFAULT_IR_OPTICAL_FRAME_ID);
+    // TODO!!
+    // _nh.getParam("serial_no", serial_no_);
+    // _nh.getParam("usb_port_id", usb_port_id_);
+    // _nh.getParam("camera_type", camera_type_);
+    // _nh.param("mode", mode_, DEFAULT_MODE);
+    // _nh.param("enable_depth", enable_[RS_STREAM_DEPTH], ENABLE_DEPTH);
+    // _nh.param("enable_color", enable_[RS_STREAM_COLOR], ENABLE_COLOR);
+    // _nh.param("enable_ir", enable_[RS_STREAM_INFRARED], ENABLE_IR);
+    // _nh.param("enable_pointcloud", enable_pointcloud_, ENABLE_PC);
+    // _nh.param("enable_tf", enable_tf_, ENABLE_TF);
+    // _nh.param("enable_tf_dynamic", enable_tf_dynamic_, ENABLE_TF_DYNAMIC);
+    // _nh.param("tf_publication_rate", tf_publication_rate_, TF_PUBLICATION_RATE);
+    // _nh.param("depth_width", width_[RS_STREAM_DEPTH], DEPTH_WIDTH);
+    // _nh.param("depth_height", height_[RS_STREAM_DEPTH], DEPTH_HEIGHT);
+    // _nh.param("color_width", width_[RS_STREAM_COLOR], COLOR_WIDTH);
+    // _nh.param("color_height", height_[RS_STREAM_COLOR], COLOR_HEIGHT);
+    // _nh.param("depth_fps", fps_[RS_STREAM_DEPTH], DEPTH_FPS);
+    // _nh.param("color_fps", fps_[RS_STREAM_COLOR], COLOR_FPS);
+    // _nh.param("base_frame_id", base_frame_id_, DEFAULT_BASE_FRAME_ID);
+    // _nh.param("depth_frame_id", frame_id_[RS_STREAM_DEPTH], DEFAULT_DEPTH_FRAME_ID);
+    // _nh.param("color_frame_id", frame_id_[RS_STREAM_COLOR], DEFAULT_COLOR_FRAME_ID);
+    // _nh.param("ir_frame_id", frame_id_[RS_STREAM_INFRARED], DEFAULT_IR_FRAME_ID);
+    // _nh.param("depth_optical_frame_id", optical_frame_id_[RS_STREAM_DEPTH], DEFAULT_DEPTH_OPTICAL_FRAME_ID);
+    // _nh.param("color_optical_frame_id", optical_frame_id_[RS_STREAM_COLOR], DEFAULT_COLOR_OPTICAL_FRAME_ID);
+    // _nh.param("ir_optical_frame_id", optical_frame_id_[RS_STREAM_INFRARED], DEFAULT_IR_OPTICAL_FRAME_ID);
 
     // set IR stream to match depth
     width_[RS_STREAM_INFRARED] = width_[RS_STREAM_DEPTH];
@@ -555,35 +557,35 @@ namespace realsense_camera
           break;
         }
       }
-      // Skip the dynamic options and set only the static camera options.
-      if (found == false)
-      {
-        std::string key;
-        double val;
+      // // Skip the dynamic options and set only the static camera options.
+      // if (found == false)
+      // {
+      //   std::string key;
+      //   double val;
 
-        if (pnh_.searchParam(opt_name, key))
-        {
-          double opt_val;
-          pnh_.getParam(key, val);
+      //   if (pnh_.searchParam(opt_name, key))
+      //   {
+      //     double opt_val;
+      //     pnh_.getParam(key, val);
 
-          // Validate and set the input values within the min-max range
-          if (val < o.min)
-          {
-            opt_val = o.min;
-          }
-          else if (val > o.max)
-          {
-            opt_val = o.max;
-          }
-          else
-          {
-            opt_val = val;
-          }
-          RCLCPP_INFO_STREAM(_nh->get_logger(), nodelet_name_ << " - Setting camera option " << opt_name << " = " << opt_val);
-          rs_set_device_option(rs_device_, o.opt, opt_val, &rs_error_);
-          checkError();
-        }
-      }
+      //     // Validate and set the input values within the min-max range
+      //     if (val < o.min)
+      //     {
+      //       opt_val = o.min;
+      //     }
+      //     else if (val > o.max)
+      //     {
+      //       opt_val = o.max;
+      //     }
+      //     else
+      //     {
+      //       opt_val = val;
+      //     }
+      //     RCLCPP_INFO_STREAM(_nh->get_logger(), nodelet_name_ << " - Setting camera option " << opt_name << " = " << opt_val);
+      //     rs_set_device_option(rs_device_, o.opt, opt_val, &rs_error_);
+      //     checkError();
+      //   }
+      // }
     }
   }
 
@@ -758,7 +760,7 @@ namespace realsense_camera
 
     for (int i = 0; i < 5; i++)
     {
-      camera_info->D.push_back(intrinsic.coeffs[i]);
+      camera_info->d.push_back(intrinsic.coeffs[i]);
     }
   }
 
@@ -965,7 +967,7 @@ namespace realsense_camera
       msg_pointcloud.header.stamp = rclcpp::Time(0);
       msg_pointcloud.is_dense = true;
 
-      sensor_msgs::msg::PointCloud2Modifier modifier(msg_pointcloud);
+      sensor_msgs::PointCloud2Modifier modifier(msg_pointcloud);
 
       modifier.setPointCloud2Fields(4, "x", 1,
           sensor_msgs::msg::PointField::FLOAT32, "y", 1,
@@ -975,13 +977,13 @@ namespace realsense_camera
 
       modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
 
-      sensor_msgs::msg::PointCloud2Iterator<float>iter_x(msg_pointcloud, "x");
-      sensor_msgs::msg::PointCloud2Iterator<float>iter_y(msg_pointcloud, "y");
-      sensor_msgs::msg::PointCloud2Iterator<float>iter_z(msg_pointcloud, "z");
+      sensor_msgs::PointCloud2Iterator<float> iter_x(msg_pointcloud, "x");
+      sensor_msgs::PointCloud2Iterator<float> iter_y(msg_pointcloud, "y");
+      sensor_msgs::PointCloud2Iterator<float> iter_z(msg_pointcloud, "z"); 
 
-      sensor_msgs::msg::PointCloud2Iterator<uint8_t>iter_r(msg_pointcloud, "r");
-      sensor_msgs::msg::PointCloud2Iterator<uint8_t>iter_g(msg_pointcloud, "g");
-      sensor_msgs::msg::PointCloud2Iterator<uint8_t>iter_b(msg_pointcloud, "b");
+      sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(msg_pointcloud, "r");
+      sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(msg_pointcloud, "g");
+      sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(msg_pointcloud, "b");
 
       float depth_point[3], color_point[3], color_pixel[2], scaled_depth;
       unsigned char *color_data = image_color.data;
@@ -1044,7 +1046,7 @@ namespace realsense_camera
       }
 
       msg_pointcloud.header.frame_id = optical_frame_id_[RS_STREAM_DEPTH];
-      pointcloud_publisher_.publish(msg_pointcloud);
+      pointcloud_publisher_->publish(msg_pointcloud);
     }
   }
 
@@ -1229,26 +1231,26 @@ namespace realsense_camera
   //         frame_id_[RS_STREAM_INFRARED], optical_frame_id_[RS_STREAM_INFRARED]));
   // }
 
-  /*
-   * Prepare transforms.
-   */
-  void BaseNodelet::prepareTransforms()
-  {
-    // Publish transforms for the cameras
-    RCLCPP_INFO_STREAM(_nh->get_logger(), nodelet_name_ << " - Publishing camera transforms (/tf)");
+  // /*
+  //  * Prepare transforms.
+  //  */
+  // void BaseNodelet::prepareTransforms()
+  // {
+  //   // Publish transforms for the cameras
+  //   RCLCPP_INFO_STREAM(_nh->get_logger(), nodelet_name_ << " - Publishing camera transforms (/tf)");
 
-    rclcpp::Rate loop_rate(tf_publication_rate_);
+  //   rclcpp::Rate loop_rate(tf_publication_rate_);
 
-    while (rclcpp::ok())
-    {
-      // update the time stamp for publication
-      transform_ts_ = rclcpp::Time(0);
+  //   while (rclcpp::ok())
+  //   {
+  //     // update the time stamp for publication
+  //     transform_ts_ = rclcpp::Time(0);
 
-      publishDynamicTransforms();
+  //     publishDynamicTransforms();
 
-      loop_rate.sleep();
-    }
-  }
+  //     loop_rate.sleep();
+  //   }
+  // }
 
   /*
    * Display error details and shutdown ROS.

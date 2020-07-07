@@ -22,6 +22,9 @@ find_package(Eigen3 REQUIRED)
 find_package(OpenCV  REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(realsense REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(cv_bridge REQUIRED)
+
 
 ###########
 ## Build ##
@@ -48,8 +51,10 @@ ament_target_dependencies(
 	OpenCV
 	rclcpp_action 
 	realsense
+	image_transport
+	cv_bridge
  )
-target_include_directories(${PROJECT_NAME}_node PRIVATE include)
-target_link_libraries(${PROJECT_NAME}_node  ${OpenCV_LIBS}  realsense)
+target_include_directories(${PROJECT_NAME}_node PRIVATE include )
+target_link_libraries(${PROJECT_NAME}_node  ${OpenCV_LIBS}  realsense boost_system )
 
 ament_package()

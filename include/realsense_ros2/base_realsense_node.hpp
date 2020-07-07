@@ -48,6 +48,7 @@
 #include <string>
 #include <vector>
 
+#include <chrono>
 #include <opencv2/core/core.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -73,6 +74,9 @@
 
 namespace realsense_camera
 {
+
+using namespace std::chrono_literals;
+
 class BaseNodelet
 {
 public:
@@ -177,7 +181,7 @@ protected:
   virtual void getCameraExtrinsics();
   // virtual void publishStaticTransforms();
   // virtual void publishDynamicTransforms();
-  virtual void prepareTransforms();
+  // virtual void prepareTransforms();
   virtual void checkError();
   virtual bool checkForSubscriber();
   virtual void wrappedSystem(const std::vector<std::string>& string_argv);
