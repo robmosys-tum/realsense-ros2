@@ -81,9 +81,10 @@ class BaseNodelet
 {
 public:
   // Interfaces.
-  virtual void onInit();
-  virtual ~BaseNodelet();
-  virtual void setDepthEnable(bool &enable_depth);
+  void onInit();
+  BaseNodelet();
+  ~BaseNodelet();
+  void setDepthEnable(bool &enable_depth);
   // virtual bool getCameraOptionValues(realsense_camera::CameraConfiguration::Request & req,
   //     realsense_camera::CameraConfiguration::Response & res);
   // virtual bool setPowerCameraService(realsense_camera::SetPower::Request & req,

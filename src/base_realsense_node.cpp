@@ -44,6 +44,12 @@ namespace realsense_camera
 {
   const std::map<std::string, std::string> CAMERA_NAME_TO_VALIDATED_FIRMWARE
         (MAP_START_VALUES, MAP_START_VALUES + MAP_START_VALUES_SIZE);
+
+  BaseNodelet::BaseNodelet()
+  {
+
+
+  }
   /*
    * Nodelet Destructor.
    */
@@ -374,19 +380,22 @@ namespace realsense_camera
    */
   void BaseNodelet::advertiseTopics()
   {
-    //TODO!!!
-    // // rclcpp::NodeHandle color_nh(nh_, COLOR_NAMESPACE);
+    // rclcpp::NodeHandle color_nh(nh_, COLOR_NAMESPACE);
     // image_transport::ImageTransport color_image_transport(color_nh);
-    // camera_publisher_[RS_STREAM_COLOR] = color_image_transport.advertiseCamera(COLOR_TOPIC, 1);
 
-    // // rclcpp::NodeHandle depth_nh(nh_, DEPTH_NAMESPACE);
+    image_transport::ImageTransport color_image_transport(_nh);
+    camera_publisher_[RS_STREAM_COLOR] = color_image_transport.advertiseCamera(COLOR_NAMESPACE+'/'+COLOR_TOPIC, 1);
+
+    // rclcpp::NodeHandle depth_nh(nh_, DEPTH_NAMESPACE);
     // image_transport::ImageTransport depth_image_transport(depth_nh);
-    // camera_publisher_[RS_STREAM_DEPTH] = depth_image_transport.advertiseCamera(DEPTH_TOPIC, 1);
-    // pointcloud_publisher_ = depth_nh.advertise<sensor_msgs::msg::PointCloud2>(PC_TOPIC, 1);
+    image_transport::ImageTransport depth_image_transport(_nh);
+    camera_publisher_[RS_STREAM_DEPTH] = depth_image_transport.advertiseCamera(DEPTH_NAMESPACE+'/'+DEPTH_TOPIC, 1);
+    pointcloud_publisher_ =  _nh->create_publisher<sensor_msgs::msg::PointCloud2>(DEPTH_NAMESPACE+'/'+PC_TOPIC, 1);
 
-    // // rclcpp::NodeHandle ir_nh(nh_, IR_NAMESPACE);
+    // rclcpp::NodeHandle ir_nh(nh_, IR_NAMESPACE);
     // image_transport::ImageTransport ir_image_transport(ir_nh);
-    // camera_publisher_[RS_STREAM_INFRARED] = ir_image_transport.advertiseCamera(IR_TOPIC, 1);
+    image_transport::ImageTransport ir_image_transport(_nh);
+    camera_publisher_[RS_STREAM_INFRARED] = ir_image_transport.advertiseCamera(IR_NAMESPACE+'/'+IR_TOPIC, 1);
   }
 
   /*
