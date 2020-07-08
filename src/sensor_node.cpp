@@ -35,49 +35,11 @@
 namespace realsense {
 
 SensorInterface::SensorInterface(rclcpp::Node::SharedPtr nh) :
-  _nh (nh)
+  _nh (nh), base_sensor(_nh)
   {
-    rs::context ctx;
-    if (ctx.get_device_count() == 0) throw std::runtime_error("No device detected. Is it plugged in?");
-    dev = ctx.get_device(0);
 
-    configureSensor();
-    setParams();
-
+    base_sensor.onInit();
   }
-
-bool SensorInterface::configureSensor (){
-
-    for (int i = (int)rs::capabilities::depth; i <= (int)rs::capabilities::fish_eye; i++)
-        if (dev->supports((rs::capabilities)i))
-            supported_streams.push_back((rs::stream)i);
-
-    // Configure all supported streams to run at 30 frames per second
-    for (auto & stream : supported_streams)
-        dev->enable_stream(stream, rs::preset::best_quality);
-
-    // Compute field of view for each enabled stream
-    for (auto & stream : supported_streams)
-    {
-        if (!dev->is_stream_enabled(stream)) continue;
-        auto intrin = dev->get_stream_intrinsics(stream);
-        std::cout << "Capturing " << stream << " at " << intrin.width << " x " << intrin.height;
-        // std::cout << std::setprecision(1) << std::fixed << ", fov = " << intrin.hfov() << " x " << intrin.vfov() << ", distortion = " << intrin.model() << std::endl;
-    }
-
-    // Start our device
-    dev->start();
-
-    return true;
-}
-
-void SensorInterface::setParams (){
-    // rows = tiles_map.at(supported_streams.size()).second;
-    // cols = tiles_map.at(supported_streams.size()).first;
-    tile_w = 640; // pixels
-    tile_h = 480; // pixels
-
-}
 
 
 void SensorInterface::setFrequency(double frequency) {
@@ -85,7 +47,8 @@ void SensorInterface::setFrequency(double frequency) {
 }
 
 void SensorInterface::run() {
-  // period = p;
+
+    base_sensor.setFrameCallbacks();
 }
 
 

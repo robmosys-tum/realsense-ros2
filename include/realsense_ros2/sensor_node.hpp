@@ -52,8 +52,6 @@ class SensorInterface {
 
 public:
 	SensorInterface(rclcpp::Node::SharedPtr nh);
-	bool configureSensor ();
-	void setParams ();
 	void setFrequency(double frequency) ;
 
 	void run();
@@ -61,7 +59,7 @@ public:
 private:
 
 	rclcpp::Node::SharedPtr _nh;
-
+	realsense_camera::BaseNodelet base_sensor;
 	rs::device * dev;
 	std::vector<rs::stream> supported_streams;
 

@@ -82,7 +82,7 @@ class BaseNodelet
 public:
   // Interfaces.
   void onInit();
-  BaseNodelet();
+  BaseNodelet(rclcpp::Node::SharedPtr nh);
   ~BaseNodelet();
   void setDepthEnable(bool &enable_depth);
   // virtual bool getCameraOptionValues(realsense_camera::CameraConfiguration::Request & req,
@@ -93,7 +93,8 @@ public:
   //     realsense_camera::ForcePower::Response & res);
   // virtual bool isPoweredCameraService(realsense_camera::IsPowered::Request & req,
   //     realsense_camera::IsPowered::Response & res);
-
+    void setFrameCallbacks();
+    
 protected:
   // Member Variables.
   // rclcpp::NodeHandle nh_;
@@ -186,7 +187,7 @@ protected:
   virtual void checkError();
   virtual bool checkForSubscriber();
   virtual void wrappedSystem(const std::vector<std::string>& string_argv);
-  virtual void setFrameCallbacks();
+
   virtual std::string checkFirmwareValidation(const std::string& fw_type,
                                               const std::string& current_fw,
                                               const std::string& camera_name,

@@ -57,4 +57,12 @@ ament_target_dependencies(
 target_include_directories(${PROJECT_NAME}_node PRIVATE include )
 target_link_libraries(${PROJECT_NAME}_node  ${OpenCV_LIBS}  realsense boost_system )
 
+ament_export_include_directories(include)
+ament_export_dependencies(${PROJECT_NAME} )
+
+install(TARGETS
+${PROJECT_NAME}_node 
+DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()

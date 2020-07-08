@@ -45,9 +45,9 @@ namespace realsense_camera
   const std::map<std::string, std::string> CAMERA_NAME_TO_VALIDATED_FIRMWARE
         (MAP_START_VALUES, MAP_START_VALUES + MAP_START_VALUES_SIZE);
 
-  BaseNodelet::BaseNodelet()
+  BaseNodelet::BaseNodelet(rclcpp::Node::SharedPtr nh) :
+  _nh (nh)
   {
-
 
   }
   /*
@@ -165,7 +165,7 @@ namespace realsense_camera
   void BaseNodelet::getParameters()
   {
     // nodelet_name_ = getName();
-    nodelet_name_ = "sensor";
+    nodelet_name_ = "RealSenseNode";
     // nh_ = getNodeHandle();
     // pnh_ = getPrivateNodeHandle();
     // TODO!!
