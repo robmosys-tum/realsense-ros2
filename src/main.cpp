@@ -33,18 +33,20 @@
 
 int main(int argc, char *argv[]) {
 
-
 	rclcpp::init(argc, argv);
 
-	rclcpp::Node::SharedPtr _nh = rclcpp::Node::make_shared("realsense_node");
-	realsense::SensorInterface node (_nh);
+	auto _nh = rclcpp::Node::make_shared("realsense_node");
 
-	rclcpp::Rate rate(100);
+	realsense::SensorInterface node (_nh);
+	rclcpp::WallRate rate(10);
+
 	while(rclcpp::ok()) {
-		rclcpp::spin_some(_nh);
+
 		node.run();
+		rclcpp::spin_some(_nh);
 		rate.sleep();
 	}
+
 	
-	
+	rclcpp::shutdown();
 }

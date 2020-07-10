@@ -52,6 +52,7 @@
 #include <opencv2/core/core.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/highgui/highgui.hpp>
+#include "rclcpp/clock.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include <sensor_msgs/msg/point_cloud2.hpp>
@@ -62,7 +63,14 @@
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
 #include <librealsense/rs.hpp>
-#include <pluginlib/class_list_macros.h>
+
+#include <pcl/point_cloud.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_ros/static_transform_broadcaster.h>
+#include <tf2/LinearMath/Quaternion.h>
+
+// #include <pluginlib/class_list_macros.h>
 // #include <tf/transform_broadcaster.h>
 // #include <tf2_ros/static_transform_broadcaster.h>
 
@@ -130,8 +138,10 @@ protected:
   std::string optical_frame_id_[STREAM_COUNT];
   cv::Mat image_[STREAM_COUNT] = {};
   image_transport::CameraPublisher camera_publisher_[STREAM_COUNT] = {};
-  sensor_msgs::msg::CameraInfo::SharedPtr  camera_info_ptr_[STREAM_COUNT] = {};
+  sensor_msgs::msg::CameraInfo::
+  SharedPtr  camera_info_ptr_[STREAM_COUNT] = {};
   std::string base_frame_id_;
+  rclcpp::Clock::SharedPtr clock_;
   float max_z_ = -1.0f;
   bool enable_pointcloud_;
   bool enable_tf_;
@@ -143,7 +153,7 @@ protected:
 
   boost::shared_ptr<boost::thread> transform_thread_;
   rclcpp::Time transform_ts_;
-  // tf2_rclcpp::StaticTransformBroadcaster static_tf_broadcaster_;
+  tf2_ros::StaticTransformBroadcaster static_tf_broadcaster_;
   // tf::TransformBroadcaster dynamic_tf_broadcaster_;
   rs_extrinsics color2depth_extrinsic_;  // color frame is base frame
   rs_extrinsics color2ir_extrinsic_;     // color frame is base frame
@@ -181,7 +191,7 @@ protected:
   virtual void setImageData(rs_stream stream_index, rs::frame &  frame);
   virtual void publishPCTopic();
   virtual void getCameraExtrinsics();
-  // virtual void publishStaticTransforms();
+  virtual void publishStaticTransforms();
   // virtual void publishDynamicTransforms();
   // virtual void prepareTransforms();
   virtual void checkError();

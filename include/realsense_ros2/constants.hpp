@@ -56,7 +56,7 @@ namespace realsense_camera
     const bool ENABLE_IR2 = false;
     const bool ENABLE_FISHEYE = true;
     const bool ENABLE_IMU = true;
-    const bool ENABLE_PC = false;
+    const bool ENABLE_PC = true;
     const bool ENABLE_TF = true;
     const bool ENABLE_TF_DYNAMIC = false;
     const double TF_PUBLICATION_RATE = 1.0;

@@ -28,7 +28,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <pluginlib/class_list_macros.hpp>
+// #include <pluginlib/class_list_macros.hpp>
 
 #include "realsense_ros2/sensor_node.hpp"
 
@@ -46,8 +46,10 @@ void SensorInterface::setFrequency(double frequency) {
   sensor_frequency_ = frequency;
 }
 
-void SensorInterface::run() {
+void SensorInterface::run() 
+{
 
+ RCLCPP_INFO(_nh->get_logger(),  "SensorInterface run");
     base_sensor.setFrameCallbacks();
 }
 
