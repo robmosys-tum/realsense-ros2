@@ -96,12 +96,43 @@ namespace realsense_camera
     }
   }
 
+  void BaseNodelet::sensorParameters() {
+    //ZR300 Parameters
+    format_[RS_STREAM_COLOR] = RS_FORMAT_RGB8;
+    encoding_[RS_STREAM_COLOR] = sensor_msgs::image_encodings::RGB8;
+    cv_type_[RS_STREAM_COLOR] = CV_8UC3;
+    unit_step_size_[RS_STREAM_COLOR] = sizeof(unsigned char) * 3;
+
+    format_[RS_STREAM_DEPTH] = RS_FORMAT_Z16;
+    encoding_[RS_STREAM_DEPTH] = sensor_msgs::image_encodings::TYPE_16UC1;
+    cv_type_[RS_STREAM_DEPTH] = CV_16UC1;
+    unit_step_size_[RS_STREAM_DEPTH] = sizeof(uint16_t);
+
+    format_[RS_STREAM_INFRARED] = RS_FORMAT_Y8;
+    encoding_[RS_STREAM_INFRARED] = sensor_msgs::image_encodings::TYPE_8UC1;
+    cv_type_[RS_STREAM_INFRARED] = CV_8UC1;
+    unit_step_size_[RS_STREAM_INFRARED] = sizeof(unsigned char);
+
+    format_[RS_STREAM_INFRARED2] = RS_FORMAT_Y8;
+    encoding_[RS_STREAM_INFRARED2] = sensor_msgs::image_encodings::TYPE_8UC1;
+    cv_type_[RS_STREAM_INFRARED2] = CV_8UC1;
+    unit_step_size_[RS_STREAM_INFRARED2] = sizeof(unsigned char);
+
+    format_[RS_STREAM_FISHEYE] = RS_FORMAT_RAW8;
+    encoding_[RS_STREAM_FISHEYE] = sensor_msgs::image_encodings::TYPE_8UC1;
+    cv_type_[RS_STREAM_FISHEYE] = CV_8UC1;
+    unit_step_size_[RS_STREAM_FISHEYE] = sizeof(unsigned char);
+
+    max_z_ = ZR300_MAX_Z;
+  }
   /*
    * Initialize the nodelet.
    */
   void BaseNodelet::onInit() try
   {
+
     getParameters();
+    sensorParameters();
 
     if (enable_[RS_STREAM_DEPTH] == false && enable_[RS_STREAM_COLOR] == false)
     {
@@ -189,20 +220,9 @@ namespace realsense_camera
   _nh->declare_parameter("color_height", COLOR_HEIGHT);
   _nh->get_parameter("color_height", height_[RS_STREAM_COLOR]);
 
-  // _nh.getParam("serial_no", serial_no_);
-  // _nh.getParam("usb_port_id", usb_port_id_);
-  // _nh.getParam("camera_type", camera_type_);
-  // _nh->declare_parameter("serial_no", COLOR_HEIGHT);
   _nh->get_parameter("serial_no", serial_no_);
-  // _nh->declare_parameter("usb_port_id", COLOR_HEIGHT);
   _nh->get_parameter("usb_port_id", usb_port_id_);
-  // _nh->declare_parameter("camera_type", usb_port_id_);
   _nh->get_parameter("camera_type", camera_type_);
-
-  // _nh.param("mode", mode_, DEFAULT_MODE);
-  // _nh.param("enable_tf", enable_tf_, ENABLE_TF);
-  // _nh.param("enable_tf_dynamic", enable_tf_dynamic_, ENABLE_TF_DYNAMIC);
-  // _nh.param("tf_publication_rate", tf_publication_rate_, TF_PUBLICATION_RATE);
   _nh->declare_parameter("mode", DEFAULT_MODE);
   _nh->get_parameter("mode", mode_);
   _nh->declare_parameter("enable_tf", ENABLE_TF);
@@ -211,18 +231,10 @@ namespace realsense_camera
   _nh->get_parameter("enable_tf_dynamic", enable_tf_dynamic_);
   _nh->declare_parameter("tf_publication_rate", TF_PUBLICATION_RATE);
   _nh->get_parameter("tf_publication_rate", tf_publication_rate_);
-
-  // _nh.param("depth_fps", fps_[RS_STREAM_DEPTH], DEPTH_FPS);
-  // _nh.param("color_fps", fps_[RS_STREAM_COLOR], COLOR_FPS);
   _nh->declare_parameter("depth_fps", DEPTH_FPS);
   _nh->get_parameter("depth_fps", fps_[RS_STREAM_DEPTH]);
   _nh->declare_parameter("color_fps", COLOR_FPS);
   _nh->get_parameter("color_fps", fps_[RS_STREAM_COLOR]);
-
-  // _nh.param("base_frame_id", base_frame_id_, DEFAULT_BASE_FRAME_ID);
-  // _nh.param("depth_frame_id", frame_id_[RS_STREAM_DEPTH], DEFAULT_DEPTH_FRAME_ID);
-  // _nh.param("color_frame_id", frame_id_[RS_STREAM_COLOR], DEFAULT_COLOR_FRAME_ID);
-  // _nh.param("ir_frame_id", frame_id_[RS_STREAM_INFRARED], DEFAULT_IR_FRAME_ID);
   _nh->declare_parameter("base_frame_id", DEFAULT_BASE_FRAME_ID);
   _nh->get_parameter("base_frame_id", base_frame_id_);
   _nh->declare_parameter("depth_frame_id", DEFAULT_DEPTH_FRAME_ID);
@@ -231,19 +243,12 @@ namespace realsense_camera
   _nh->get_parameter("color_frame_id", frame_id_[RS_STREAM_COLOR]);
   _nh->declare_parameter("ir_frame_id", DEFAULT_IR_FRAME_ID);
   _nh->get_parameter("ir_frame_id", frame_id_[RS_STREAM_INFRARED]);
-
-  // _nh.param("depth_optical_frame_id", optical_frame_id_[RS_STREAM_DEPTH], DEFAULT_DEPTH_OPTICAL_FRAME_ID);
-  // _nh.param("color_optical_frame_id", optical_frame_id_[RS_STREAM_COLOR], DEFAULT_COLOR_OPTICAL_FRAME_ID);
-  // _nh.param("ir_optical_frame_id", optical_frame_id_[RS_STREAM_INFRARED], DEFAULT_IR_OPTICAL_FRAME_ID);
   _nh->declare_parameter("depth_optical_frame_id", DEFAULT_DEPTH_OPTICAL_FRAME_ID);
   _nh->get_parameter("depth_optical_frame_id", optical_frame_id_[RS_STREAM_DEPTH]);
   _nh->declare_parameter("color_optical_frame_id", DEFAULT_COLOR_OPTICAL_FRAME_ID);
   _nh->get_parameter("color_optical_frame_id", optical_frame_id_[RS_STREAM_COLOR]);
   _nh->declare_parameter("ir_optical_frame_id", DEFAULT_IR_OPTICAL_FRAME_ID);
   _nh->get_parameter("ir_optical_frame_id", optical_frame_id_[RS_STREAM_INFRARED]);
-
-  _nh->declare_parameter("max_z", 5.0);
-  _nh->get_parameter("max_z", max_z_);
 
 
     // set IR stream to match depth
@@ -435,13 +440,13 @@ namespace realsense_camera
     // rclcpp::NodeHandle color_nh(nh_, COLOR_NAMESPACE);
     // image_transport::ImageTransport color_image_transport(color_nh);
 
-    // image_transport::ImageTransport color_image_transport(_nh);
-    // camera_publisher_[RS_STREAM_COLOR] = color_image_transport.advertiseCamera(COLOR_NAMESPACE+'/'+COLOR_TOPIC, 1);
+    image_transport::ImageTransport color_image_transport(_nh);
+    camera_publisher_[RS_STREAM_COLOR] = color_image_transport.advertiseCamera(COLOR_NAMESPACE+'/'+COLOR_TOPIC, 1);
 
     // // rclcpp::NodeHandle depth_nh(nh_, DEPTH_NAMESPACE);
     // // image_transport::ImageTransport depth_image_transport(depth_nh);
-    // image_transport::ImageTransport depth_image_transport(_nh);
-    // camera_publisher_[RS_STREAM_DEPTH] = depth_image_transport.advertiseCamera(DEPTH_NAMESPACE+'/'+DEPTH_TOPIC, 1);
+    image_transport::ImageTransport depth_image_transport(_nh);
+    camera_publisher_[RS_STREAM_DEPTH] = depth_image_transport.advertiseCamera(DEPTH_NAMESPACE+'/'+DEPTH_TOPIC, 1);
     pointcloud_publisher_ =  _nh->create_publisher<sensor_msgs::msg::PointCloud2>(DEPTH_NAMESPACE+'/'+PC_TOPIC, 1);
 
     // // rclcpp::NodeHandle ir_nh(nh_, IR_NAMESPACE);
@@ -963,21 +968,21 @@ namespace realsense_camera
     {
       setImageData(stream_index, frame);
       // Publish stream only if there is at least one subscriber.
-      if (camera_publisher_[stream_index].getNumSubscribers() > 0)
-      {
+      // if (camera_publisher_[stream_index].getNumSubscribers() > 0)
+      // {
         sensor_msgs::msg::Image::SharedPtr  msg = cv_bridge::CvImage(std_msgs::msg::Header(),
                         encoding_[stream_index],
-                                image_[stream_index]).toImageMsg();
+                                image_[stream_index]).toImageMsg(); 
         msg->header.frame_id = optical_frame_id_[stream_index];
         // Publish timestamp to synchronize frames.
         msg->header.stamp = getTimestamp(stream_index, frame_ts);
         msg->width = image_[stream_index].cols;
         msg->height = image_[stream_index].rows;
-        msg->is_bigendian = false;
+        msg->is_bigendian = false;  
         msg->step = step_[stream_index];
-        camera_info_ptr_[stream_index]->header.stamp = msg->header.stamp;
-        // camera_publisher_[stream_index].publish(msg, camera_info_ptr_[stream_index]);
-      }
+        camera_info_ptr_[stream_index]->header.stamp = msg->header.stamp; 
+        camera_publisher_[stream_index].publish(msg, camera_info_ptr_[stream_index]);
+      // }
     }
     ts_[stream_index] = frame_ts;
   }

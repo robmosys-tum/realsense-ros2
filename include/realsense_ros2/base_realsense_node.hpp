@@ -171,6 +171,7 @@ protected:
   std::queue<pid_t> system_proc_groups_;
 
   // Member Functions.
+  void sensorParameters();
   virtual void getParameters();
   virtual bool connectToCamera();
   virtual std::vector<int> listCameras(int num_of_camera);
