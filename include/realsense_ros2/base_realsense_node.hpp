@@ -142,7 +142,7 @@ protected:
   SharedPtr  camera_info_ptr_[STREAM_COUNT] = {};
   std::string base_frame_id_;
   rclcpp::Clock::SharedPtr clock_;
-  float max_z_ = -1.0f;
+  float max_z_ = 5.0f;
   bool enable_pointcloud_;
   bool enable_tf_;
   bool enable_tf_dynamic_;

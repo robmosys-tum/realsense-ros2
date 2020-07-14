@@ -48,8 +48,6 @@ void SensorInterface::setFrequency(double frequency) {
 
 void SensorInterface::run() 
 {
-
- RCLCPP_INFO(_nh->get_logger(),  "SensorInterface run");
     base_sensor.setFrameCallbacks();
 }
 

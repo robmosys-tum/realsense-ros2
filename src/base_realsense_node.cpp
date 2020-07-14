@@ -140,7 +140,6 @@ namespace realsense_camera
         publishStaticTransforms();
       // }
     }
-        RCLCPP_INFO_STREAM(_nh->get_logger(), nodelet_name_ << " Pon init after");
 
     // Start dynamic reconfigure callback
     // startDynamicReconfCallback();
@@ -242,6 +241,10 @@ namespace realsense_camera
   _nh->get_parameter("color_optical_frame_id", optical_frame_id_[RS_STREAM_COLOR]);
   _nh->declare_parameter("ir_optical_frame_id", DEFAULT_IR_OPTICAL_FRAME_ID);
   _nh->get_parameter("ir_optical_frame_id", optical_frame_id_[RS_STREAM_INFRARED]);
+
+  _nh->declare_parameter("max_z", 5.0);
+  _nh->get_parameter("max_z", max_z_);
+
 
     // set IR stream to match depth
     width_[RS_STREAM_INFRARED] = width_[RS_STREAM_DEPTH];
@@ -652,37 +655,31 @@ namespace realsense_camera
   */
   void BaseNodelet::setFrameCallbacks() try
   {
-    RCLCPP_INFO(_nh->get_logger(),  "setFrameCallbacks");
-
-
-    depth_frame_handler_ = [&](rs::frame frame)  // NOLINT(build/c++11)    // AQUIII FALLA
+    depth_frame_handler_ = [&](rs::frame frame)  // AQUIII FALLA
     {
-          RCLCPP_INFO(_nh->get_logger(),  "publishTopic");
       publishTopic(RS_STREAM_DEPTH, frame);
 
       if (enable_pointcloud_)
       {
-            RCLCPP_INFO(_nh->get_logger(),  "setFrameCallbacks");
         publishPCTopic();
       }
     };
 
- // RCLCPP_INFO(_nh->get_logger(),  "setFrameCallbacks2");
- //    // color_frame_handler_ = [&](rs::frame frame)  // NOLINT(build/c++11)
- //    // {
- //    //   publishTopic(RS_STREAM_COLOR, frame);
- //    // };
+    color_frame_handler_ = [&](rs::frame frame)  // NOLINT(build/c++11)
+    {
+      publishTopic(RS_STREAM_COLOR, frame);
+    };
 
  //    // ir_frame_handler_ = [&](rs::frame frame)  // NOLINT(build/c++11)
  //    // {
  //    //   publishTopic(RS_STREAM_INFRARED, frame);
  //    // };
 
- //    rs_set_frame_callback_cpp(rs_device_, RS_STREAM_DEPTH, new rs::frame_callback(depth_frame_handler_), &rs_error_);
- //    checkError();
+    rs_set_frame_callback_cpp(rs_device_, RS_STREAM_DEPTH, new rs::frame_callback(depth_frame_handler_), &rs_error_);
+    checkError();
 
- //    rs_set_frame_callback_cpp(rs_device_, RS_STREAM_COLOR, new rs::frame_callback(color_frame_handler_), &rs_error_);
- //    checkError();
+    rs_set_frame_callback_cpp(rs_device_, RS_STREAM_COLOR, new rs::frame_callback(color_frame_handler_), &rs_error_);
+    checkError();
  // RCLCPP_INFO(_nh->get_logger(),  "setFrameCallbacks3");
     // // Need to add this check due to a bug in librealsense which calls the IR callback
     // // if INFRARED stream is disable AND INFRARED2 stream is enabled
@@ -853,7 +850,6 @@ namespace realsense_camera
   {
     if (rs_is_device_streaming(rs_device_, 0) == 0)
     {
-      RCLCPP_INFO_STREAM(_nh->get_logger(), nodelet_name_ << " - Starting camera");
       // Set up the callbacks for each stream
       setFrameCallbacks();
       try
@@ -1008,7 +1004,6 @@ namespace realsense_camera
    */
   void BaseNodelet::publishPCTopic()
   {
-    RCLCPP_INFO_STREAM(_nh->get_logger(), nodelet_name_ << " PC Publish");
     cv::Mat & image_color = image_[RS_STREAM_COLOR];
     // Publish pointcloud only if there is at least one subscriber.
     // if (pointcloud_publisher_.getNumSubscribers() > 0 && rs_is_stream_enabled(rs_device_, RS_STREAM_DEPTH, 0) == 1)
@@ -1045,7 +1040,6 @@ namespace realsense_camera
         "rgb", 1, sensor_msgs::msg::PointField::FLOAT32);
 
       modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
-      modifier.resize(msg_pointcloud.width*msg_pointcloud.height);
 
       sensor_msgs::PointCloud2Iterator<float> iter_x(msg_pointcloud, "x");
       sensor_msgs::PointCloud2Iterator<float> iter_y(msg_pointcloud, "y");
@@ -1079,37 +1073,36 @@ namespace realsense_camera
           *iter_y = depth_point[1]; 
           *iter_z = depth_point[2];
 
-           // RCLCPP_INFO_STREAM(_nh->get_logger(), depth_point[0]<< " "<<depth_point[1]<< " "<<depth_point[2]);
           // Default to white color.
           *iter_r = static_cast<uint8_t>(255);
           *iter_g = static_cast<uint8_t>(255);
           *iter_b = static_cast<uint8_t>(255);
 
-          if (enable_[RS_STREAM_COLOR] == true)
-          {
-            rs_transform_point_to_point(color_point, &z_extrinsic, depth_point);
-            rs_project_point_to_pixel(color_pixel, &color_intrinsic, color_point);
+          // if (enable_[RS_STREAM_COLOR] == true)
+          // {
+          //   rs_transform_point_to_point(color_point, &z_extrinsic, depth_point);
+          //   rs_project_point_to_pixel(color_pixel, &color_intrinsic, color_point);
 
-            if (color_pixel[1] < 0.0f || color_pixel[1] >= image_color.rows
-                || color_pixel[0] < 0.0f || color_pixel[0] >= image_color.cols)
-            {
+          //   if (color_pixel[1] < 0.0f || color_pixel[1] >= image_color.rows
+          //       || color_pixel[0] < 0.0f || color_pixel[0] >= image_color.cols)
+          //   {
 
-              // For out of bounds color data, default to a shade of blue in order to visually distinguish holes.
-              // This color value is same as the librealsense out of bounds color value.
-              *iter_r = static_cast<uint8_t>(96);
-              *iter_g = static_cast<uint8_t>(157);
-              *iter_b = static_cast<uint8_t>(198);
-            }
-            else
-            {
-              int i = static_cast<int>(color_pixel[0]);
-              int j = static_cast<int>(color_pixel[1]);
+          //     // For out of bounds color data, default to a shade of blue in order to visually distinguish holes.
+          //     // This color value is same as the librealsense out of bounds color value.
+          //     *iter_r = static_cast<uint8_t>(96);
+          //     *iter_g = static_cast<uint8_t>(157);
+          //     *iter_b = static_cast<uint8_t>(198);
+          //   }
+          //   else
+          //   {
+          //     int i = static_cast<int>(color_pixel[0]);
+          //     int j = static_cast<int>(color_pixel[1]);
 
-              *iter_r = static_cast<uint8_t>(color_data[i * 3 + j * image_color.cols * 3]);
-              *iter_g = static_cast<uint8_t>(color_data[i * 3 + j * image_color.cols * 3 + 1]);
-              *iter_b = static_cast<uint8_t>(color_data[i * 3 + j * image_color.cols * 3 + 2]);
-            }
-          }
+          //     *iter_r = static_cast<uint8_t>(color_data[i * 3 + j * image_color.cols * 3]);
+          //     *iter_g = static_cast<uint8_t>(color_data[i * 3 + j * image_color.cols * 3 + 1]);
+          //     *iter_b = static_cast<uint8_t>(color_data[i * 3 + j * image_color.cols * 3 + 2]);
+          //   }
+          // }
 
           image_depth16_++;
           
